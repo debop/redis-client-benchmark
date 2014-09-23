@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.github.debop</groupId>
+    <artifactId>redis-client-benchmark</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+
+    <name>Redis Client Benchmark</name>
+
+    <properties>
+        <jdk.version>1.7</jdk.version>
+        <scala.version>2.11.2</scala.version>
+        <akka.version>2.3.6</akka.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+
+        <!-- Jedis -->
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>2.5.2</version>
+        </dependency>
+
+        <!-- Redis Client for Scala -->
+        <dependency>
+            <groupId>com.etaty.rediscala</groupId>
+            <artifactId>rediscala_2.11</artifactId>
+            <version>1.3.1</version>
+        </dependency>
+
+        <!-- Akka -->
+        <dependency>
+            <groupId>com.typesafe.akka</groupId>
+            <artifactId>akka-actor_2.11</artifactId>
+            <version>${akka.version}</version>
+        </dependency>
+
+        <!-- Scalameter -->
+        <dependency>
+            <groupId>com.storm-enroute</groupId>
+            <artifactId>scalameter_2.11</artifactId>
+            <version>0.6</version>
+        </dependency>
+
+        <!-- ScalaTest -->
+        <dependency>
+            <groupId>org.scalatest</groupId>
+            <artifactId>scalatest_2.11</artifactId>
+            <version>2.2.2</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <repositories>
+        <repository>
+            <id>rediscala</id>
+            <name>RedisScala</name>
+            <url>http://dl.bintray.com/etaty/maven</url>
+        </repository>
+    </repositories>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-idea-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <downloadSources>true</downloadSources>
+                    <downloadJavadocs>true</downloadJavadocs>
+                    <dependenciesAsLibraries>true</dependenciesAsLibraries>
+                    <useFullNames>false</useFullNames>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>net.alchim31.maven</groupId>
+                <artifactId>scala-maven-plugin</artifactId>
+                <version>3.1.6</version>
+                <configuration>
+                    <scalaVersion>${scala.version}</scalaVersion>
+                    <analysisCacheFile>${project.build.outputDirectory}/analysis-cache-file</analysisCacheFile>
+                    <testAnalysisCacheFile>${project.build.testOutputDirectory}/test-analysis-cache-file
+                    </testAnalysisCacheFile>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <args>
+                        <!-- NOTE: akka 사용 시에는 적용하면 안됩니다!!! -->
+                        <!--<arg>-optimise</arg>-->
+                        <arg>-Yconst-opt</arg>
+                        <arg>-Ydead-code</arg>
+                        <arg>-Yclosure-elim</arg>
+                        <arg>-Yinline</arg>
+                        <arg>-target:jvm-${jdk.version}</arg>
+                        <arg>-unchecked</arg>
+                        <arg>-deprecation</arg>
+                        <arg>-explaintypes</arg>
+                        <arg>-Dfile.encoding=UTF-8</arg>
+                        <arg>-nowarn</arg>
+                    </args>
+                    <javacArgs>
+                        <javacArg>-source</javacArg>
+                        <javacArg>${jdk.version}</javacArg>
+                        <javacArg>-target</javacArg>
+                        <javacArg>${jdk.version}</javacArg>
+                        <javacArg>-Dfile.encoding=UTF-8</javacArg>
+                    </javacArgs>
+                    <jvmArgs>
+                        <jvmArg>-Xms128M</jvmArg>
+                        <jvmArg>-Xmx1G</jvmArg>
+                        <jvmArg>-XX:+UseCompressedOops</jvmArg>
+                        <jvmArg>-XX:+UseParallelOldGC</jvmArg>
+                        <jvmArg>-Dfile.encoding=UTF-8</jvmArg>
+                    </jvmArgs>
+
+                    <compilerPlugins>
+                        <!--
+                            NOTE: hconnect-data-slick 의 SlickSchema 에서 예외가 발생하여 제거함.
+                            NOTE: 플러그인을 정의하면 컴파일 시 @miniboxed를 자동으로 붙여주는데, 원치않는 곳에 붇을 수 있어 수동작업을 추천한다.
+                        -->
+                        <!--<compilerPlugin>-->
+                        <!--<groupId>org.scala-miniboxing.plugins</groupId>-->
+                        <!--<artifactId>miniboxing-plugin_2.11</artifactId>-->
+                        <!--<version>0.4-SNAPSHOT</version>-->
+                        <!--</compilerPlugin>-->
+                    </compilerPlugins>
+
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>scala-compile-first</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>scala-test-compile</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- enable ScalaTest -->
+            <plugin>
+                <groupId>org.scalatest</groupId>
+                <artifactId>scalatest-maven-plugin</artifactId>
+                <version>1.0</version>
+                <configuration>
+                    <forkMode>once</forkMode>
+                    <argLine>-ea</argLine>
+                    <argLine>-server</argLine>
+                    <argLine>-Xmx2G</argLine>
+                    <argLine>-XX:+UseCompressedOops</argLine>
+                    <argLine>-XX:+UseParallelOldGC</argLine>
+                    <argLine>-Dfile.encoding=UTF-8</argLine>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
