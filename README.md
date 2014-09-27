@@ -8,8 +8,8 @@ Benchmark of Redis Client Library (Jedis &amp; Rediscala)
 Redis : localhost, 2.8.16
 
 ### 대상 library
-  1. rediscala (scala, akka)
-  2. jedis
+  1. [rediscala](https://github.com/etaty/rediscala) (using akka)
+  2. [jedis](https://github.com/xetorthio/jedis)
   3. jedis with jedis pool (max pool size = 8) (scala parallel 사용)
 
 ### 결론 (내생각임)
