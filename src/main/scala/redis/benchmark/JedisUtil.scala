@@ -8,7 +8,7 @@ import redis.clients.jedis.{Jedis, JedisPool, JedisPoolConfig}
  */
 object JedisUtil {
 
-  def createJedisPoolConfig(maxTotal: Int = 8) = {
+  def createJedisPoolConfig(maxTotal: Int = 32) = {
     val pool = new JedisPoolConfig()
     pool.setMaxTotal(maxTotal)
     pool

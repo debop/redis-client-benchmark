@@ -16,7 +16,7 @@ import scala.concurrent.{Await, Future}
 object SortedSetBenchmark extends PerformanceTest.Quickbenchmark {
 
   // val sizes = Gen.range("size")(100, 400, 100)
-  val sizes = Gen.range("size")(10000, 40000, 10000)
+  val sizes = Gen.range("size")(1000, 4000, 1000)
 
   implicit val actorSystem = ActorSystem("redis-benchmark")
 
